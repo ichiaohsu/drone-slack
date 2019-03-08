@@ -32,15 +32,16 @@ type (
 	}
 
 	Config struct {
-		Webhook   string
-		Channel   string
-		Recipient string
-		Username  string
-		Template  string
-		ImageURL  string
-		IconURL   string
-		IconEmoji string
-		LinkNames bool
+		Webhook        string
+		Channel        string
+		Recipient      string
+		Username       string
+		Template       string
+		ServiceAddress string
+		ImageURL       string
+		IconURL        string
+		IconEmoji      string
+		LinkNames      bool
 	}
 
 	Job struct {
@@ -80,7 +81,7 @@ func (p Plugin) Exec() error {
 	}
 	if p.Config.Template != "" {
 		txt, err := template.RenderTrim(p.Config.Template, p)
-
+		fmt.Printf(txt)
 		if err != nil {
 			return err
 		}

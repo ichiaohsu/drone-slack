@@ -66,6 +66,12 @@ func main() {
 			EnvVar: "PLUGIN_ICON_EMOJI",
 		},
 		cli.StringFlag{
+			Name:     "service.address",
+			Usage:    "service external address",
+			EnvVar:   "PLUGIN_SERVICE_ADDRESS",
+			FilePath: ".address",
+		},
+		cli.StringFlag{
 			Name:   "repo.owner",
 			Usage:  "repository owner",
 			EnvVar: "DRONE_REPO_OWNER",
@@ -188,15 +194,16 @@ func run(c *cli.Context) error {
 			Started: c.Int64("job.started"),
 		},
 		Config: Config{
-			Webhook:   c.String("webhook"),
-			Channel:   c.String("channel"),
-			Recipient: c.String("recipient"),
-			Username:  c.String("username"),
-			Template:  c.String("template"),
-			ImageURL:  c.String("image"),
-			IconURL:   c.String("icon.url"),
-			IconEmoji: c.String("icon.emoji"),
-			LinkNames: c.Bool("link_names"),
+			Webhook:        c.String("webhook"),
+			Channel:        c.String("channel"),
+			Recipient:      c.String("recipient"),
+			Username:       c.String("username"),
+			Template:       c.String("template"),
+			ImageURL:       c.String("image"),
+			ServiceAddress: c.String("service.address"),
+			IconURL:        c.String("icon.url"),
+			IconEmoji:      c.String("icon.emoji"),
+			LinkNames:      c.Bool("link_names"),
 		},
 	}
 
