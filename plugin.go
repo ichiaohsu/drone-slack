@@ -85,6 +85,7 @@ func (p Plugin) Exec() error {
 		txt, err := template.RenderTrim(p.Config.Template, p)
 		fmt.Printf(txt)
 		if err != nil {
+			fmt.Printf("template rendering error:%s\n", err.Error())
 			return err
 		}
 

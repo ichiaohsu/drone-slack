@@ -80,7 +80,9 @@ pipeline:
   publish_linux_amd64:
     image: plugins/gcr
     repo: mirrormedia-1470651750304/${DRONE_REPO_NAME}
-    tag: ${DRONE_COMMIT_AUTHOR}_${DRONE_BUILD_NUMBER}
+    tag:
+      - ${DRONE_COMMIT_SHA:0:7}
+      - latest
     dockerfile: docker/Dockerfile.linux.amd64
     environment:
       - DOCKER_LAUNCH_DEBUG=true
@@ -93,11 +95,11 @@ pipeline:
 ---
 # kind: pipeline
 # name: testing
-# 
+#
 # platform:
 #   os: linux
 #   arch: amd64
-# 
+#
 # steps:
 # - name: vet
 #   pull: always
@@ -106,7 +108,7 @@ pipeline:
 #   - go vet ./...
 #   environment:
 #     GO111MODULE: on
-# 
+#
 # - name: test
 #   pull: always
 #   image: golang:1.11
@@ -114,19 +116,19 @@ pipeline:
 #   - go test -cover ./...
 #   environment:
 #     GO111MODULE: on
-# 
+#
 # trigger:
 #   branch:
 #   - master
-# 
+#
 # ---
 # kind: pipeline
 # name: linux-amd64
-# 
+#
 # platform:
 #   os: linux
 #   arch: amd64
-# 
+#
 # steps:
 # - name: build-push
 #   pull: always
@@ -140,7 +142,7 @@ pipeline:
 #     event:
 #     - push
 #     - pull_request
-# 
+#
 # - name: build-tag
 #   pull: always
 #   image: golang:1.11
@@ -152,13 +154,13 @@ pipeline:
 #   when:
 #     event:
 #     - tag
-# 
+#
 # - name: executable
 #   pull: always
 #   image: golang:1.11
 #   commands:
 #   - ./release/linux/amd64/drone-slack --help
-# 
+#
 # - name: dryrun
 #   pull: always
 #   image: plugins/docker:linux-amd64
@@ -174,7 +176,7 @@ pipeline:
 #   when:
 #     event:
 #     - pull_request
-# 
+#
 # - name: publish
 #   pull: always
 #   image: plugins/docker:linux-amd64
@@ -191,22 +193,22 @@ pipeline:
 #     event:
 #     - push
 #     - tag
-# 
+#
 # trigger:
 #   branch:
 #   - master
-# 
+#
 # depends_on:
 # - testing
-# 
+#
 # ---
 # kind: pipeline
 # name: linux-arm64
-# 
+#
 # platform:
 #   os: linux
 #   arch: arm64
-# 
+#
 # steps:
 # - name: build-push
 #   pull: always
@@ -220,7 +222,7 @@ pipeline:
 #     event:
 #     - push
 #     - pull_request
-# 
+#
 # - name: build-tag
 #   pull: always
 #   image: golang:1.11
@@ -232,13 +234,13 @@ pipeline:
 #   when:
 #     event:
 #     - tag
-# 
+#
 # - name: executable
 #   pull: always
 #   image: golang:1.11
 #   commands:
 #   - ./release/linux/arm64/drone-slack --help
-# 
+#
 # - name: dryrun
 #   pull: always
 #   image: plugins/docker:linux-arm64
@@ -254,7 +256,7 @@ pipeline:
 #   when:
 #     event:
 #     - pull_request
-# 
+#
 # - name: publish
 #   pull: always
 #   image: plugins/docker:linux-arm64
@@ -271,22 +273,22 @@ pipeline:
 #     event:
 #     - push
 #     - tag
-# 
+#
 # trigger:
 #   branch:
 #   - master
-# 
+#
 # depends_on:
 # - testing
-# 
+#
 # ---
 # kind: pipeline
 # name: linux-arm
-# 
+#
 # platform:
 #   os: linux
 #   arch: arm
-# 
+#
 # steps:
 # - name: build-push
 #   pull: always
@@ -300,7 +302,7 @@ pipeline:
 #     event:
 #     - push
 #     - pull_request
-# 
+#
 # - name: build-tag
 #   pull: always
 #   image: golang:1.11
@@ -312,13 +314,13 @@ pipeline:
 #   when:
 #     event:
 #     - tag
-# 
+#
 # - name: executable
 #   pull: always
 #   image: golang:1.11
 #   commands:
 #   - ./release/linux/arm/drone-slack --help
-# 
+#
 # - name: dryrun
 #   pull: always
 #   image: plugins/docker:linux-arm
@@ -334,7 +336,7 @@ pipeline:
 #   when:
 #     event:
 #     - pull_request
-# 
+#
 # - name: publish
 #   pull: always
 #   image: plugins/docker:linux-arm
@@ -351,22 +353,22 @@ pipeline:
 #     event:
 #     - push
 #     - tag
-# 
+#
 # trigger:
 #   branch:
 #   - master
-# 
+#
 # depends_on:
 # - testing
-# 
+#
 # ---
 # kind: pipeline
 # name: notifications
-# 
+#
 # platform:
 #   os: linux
 #   arch: amd64
-# 
+#
 # steps:
 # - name: manifest
 #   pull: always
@@ -378,25 +380,25 @@ pipeline:
 #     spec: docker/manifest.tmpl
 #     username:
 #       from_secret: docker_username
-# 
+#
 # - name: microbadger
 #   pull: always
 #   image: plugins/webhook:1
 #   settings:
 #     url:
 #       from_secret: microbadger_url
-# 
+#
 # trigger:
 #   branch:
 #   - master
 #   event:
 #   - push
 #   - tag
-# 
+#
 # depends_on:
 # - linux-amd64
 # - linux-arm64
 # - linux-arm
-# 
+#
 # ...
-# 
+#
