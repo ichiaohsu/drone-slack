@@ -79,6 +79,8 @@ func (p Plugin) Exec() error {
 	if p.Config.LinkNames == true {
 		payload.LinkNames = "1"
 	}
+	fmt.Printf("The whole p structure:%v\n", p)
+	fmt.Printf("service address:%s\n", p.Config.ServiceAddress)
 	if p.Config.Template != "" {
 		txt, err := template.RenderTrim(p.Config.Template, p)
 		fmt.Printf(txt)
