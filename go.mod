@@ -1,4 +1,4 @@
-module github.com/drone-plugins/drone-slack
+module github.com/ichiaohsu/drone-slack
 
 require (
 	bou.ke/monkey v1.0.1 // indirect
@@ -8,6 +8,6 @@ require (
 	github.com/pkg/errors v0.8.1 // indirect
 	github.com/stretchr/testify v1.3.0 // indirect
 	github.com/tkuchiki/faketime v0.1.1 // indirect
-	github.com/urfave/cli v1.20.0
+	github.com/urfave/cli v1.20.1-0.20171104023540-44cb242eeb4d
 	gopkg.in/yaml.v2 v2.2.2 // indirect
 )

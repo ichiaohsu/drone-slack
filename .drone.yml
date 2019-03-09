@@ -1,6 +1,6 @@
 workspace:
   base: /go
-  path: src/github.com/drone-plugins/drone-slack
+  path: src/github.com/ichiaohsu/drone-slack
 
 pipeline:
   test:
