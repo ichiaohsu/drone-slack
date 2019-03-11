@@ -15,33 +15,33 @@ type (
 	}
 
 	Build struct {
-		Tag      string
-		Event    string
-		Number   int
-		Commit   string
-		Ref      string
-		Branch   string
-		Author   string
-		Pull     string
-		Message  string
-		DeployTo string
-		Status   string
-		Link     string
-		Started  int64
-		Created  int64
+		Tag         string
+		Event       string
+		Number      int
+		Commit      string
+		Ref         string
+		Branch      string
+		Author      string
+		Pull        string
+		Message     string
+		DeployTo    string
+		Status      string
+		Link        string
+		Started     int64
+		Created     int64
+		ServiceAddr string
 	}
 
 	Config struct {
-		Webhook        string
-		Channel        string
-		Recipient      string
-		Username       string
-		Template       string
-		ServiceAddress string
-		ImageURL       string
-		IconURL        string
-		IconEmoji      string
-		LinkNames      bool
+		Webhook   string
+		Channel   string
+		Recipient string
+		Username  string
+		Template  string
+		ImageURL  string
+		IconURL   string
+		IconEmoji string
+		LinkNames bool
 	}
 
 	Job struct {
@@ -80,7 +80,7 @@ func (p Plugin) Exec() error {
 		payload.LinkNames = "1"
 	}
 	fmt.Printf("The whole p structure:%v\n", p)
-	fmt.Printf("service address:%s\n", p.Config.ServiceAddress)
+	fmt.Printf("service address:%s\n", p.Build.ServiceAddr)
 	if p.Config.Template != "" {
 		txt, err := template.RenderTrim(p.Config.Template, p)
 		fmt.Printf(txt)
