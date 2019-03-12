@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -42,6 +43,7 @@ type (
 		IconURL   string
 		IconEmoji string
 		LinkNames bool
+		Usermaps  string
 	}
 
 	Job struct {
@@ -71,7 +73,21 @@ func (p Plugin) Exec() error {
 	payload.IconUrl = p.Config.IconURL
 	payload.IconEmoji = p.Config.IconEmoji
 
+	// Parse Recipient
+	usermaps := make(map[string]string)
+	if p.Config.Usermaps != "" {
+		if err := json.Unmarshal([]byte(p.Config.Usermaps), &usermaps); err != nil {
+			fmt.Printf("Usermaps parsing error:%s\n", err.Error())
+			return err
+		}
+	}
+	fmt.Printf("Usermaps:%v\n", usermaps)
 	if p.Config.Recipient != "" {
+		fmt.Printf("Recipient before usermap check:%s\n", p.Config.Recipient)
+		if val, ok := usermaps[p.Config.Recipient]; ok {
+			p.Config.Recipient = val
+		}
+		fmt.Printf("Recipient after usermap check:%s\n", p.Config.Recipient)
 		payload.Channel = prepend("@", p.Config.Recipient)
 	} else if p.Config.Channel != "" {
 		payload.Channel = prepend("#", p.Config.Channel)

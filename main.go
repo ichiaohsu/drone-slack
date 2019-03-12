@@ -72,6 +72,11 @@ func main() {
 			FilePath: ".address",
 		},
 		cli.StringFlag{
+			Name:   "usermaps",
+			Usage:  "Mapping between Github and Slack user accounts",
+			EnvVar: "PLUGIN_USERMAPS",
+		},
+		cli.StringFlag{
 			Name:   "repo.owner",
 			Usage:  "repository owner",
 			EnvVar: "DRONE_REPO_OWNER",
@@ -204,6 +209,7 @@ func run(c *cli.Context) error {
 			IconURL:   c.String("icon.url"),
 			IconEmoji: c.String("icon.emoji"),
 			LinkNames: c.Bool("link_names"),
+			Usermaps:  c.String("usermaps"),
 		},
 	}
 
