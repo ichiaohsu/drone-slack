@@ -77,17 +77,13 @@ func (p Plugin) Exec() error {
 	usermaps := make(map[string]string)
 	if p.Config.Usermaps != "" {
 		if err := json.Unmarshal([]byte(p.Config.Usermaps), &usermaps); err != nil {
-			fmt.Printf("Usermaps parsing error:%s\n", err.Error())
 			return err
 		}
 	}
-	fmt.Printf("Usermaps:%v\n", usermaps)
 	if p.Config.Recipient != "" {
-		fmt.Printf("Recipient before usermap check:%s\n", p.Config.Recipient)
 		if val, ok := usermaps[p.Config.Recipient]; ok {
 			p.Config.Recipient = val
 		}
-		fmt.Printf("Recipient after usermap check:%s\n", p.Config.Recipient)
 		payload.Channel = prepend("@", p.Config.Recipient)
 	} else if p.Config.Channel != "" {
 		payload.Channel = prepend("#", p.Config.Channel)
@@ -95,13 +91,9 @@ func (p Plugin) Exec() error {
 	if p.Config.LinkNames == true {
 		payload.LinkNames = "1"
 	}
-	fmt.Printf("The whole p structure:%v\n", p)
-	fmt.Printf("service address:%s\n", p.Build.ServiceAddr)
 	if p.Config.Template != "" {
 		txt, err := template.RenderTrim(p.Config.Template, p)
-		fmt.Printf(txt)
 		if err != nil {
-			fmt.Printf("template rendering error:%s\n", err.Error())
 			return err
 		}
 

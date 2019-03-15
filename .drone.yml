@@ -83,12 +83,13 @@ pipeline:
     tag:
       - ${DRONE_COMMIT_SHA:0:7}
       - latest
+      - ${DRONE_TAG}
     dockerfile: docker/Dockerfile.linux.amd64
     environment:
       - DOCKER_LAUNCH_DEBUG=true
     secrets: [google_credentials]
     when:
-      event: [push]
+      event: [push, tag]
       branch: [master]
     # pull: true
     # secrets: [ docker_username, docker_password ]
