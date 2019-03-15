@@ -83,16 +83,30 @@ pipeline:
     tag:
       - ${DRONE_COMMIT_SHA:0:7}
       - latest
+    dockerfile: docker/Dockerfile.linux.amd64
+    environment:
+      - DOCKER_LAUNCH_DEBUG=true
+    secrets: [google_credentials]
+    when:
+      event: [push]
+      branch: [master]
+    # pull: true
+    # secrets: [ docker_username, docker_password ]
+
+  publish_linux_amd64:
+    image: plugins/gcr
+    repo: mirrormedia-1470651750304/${DRONE_REPO_NAME}
+    tag:
+      - ${DRONE_COMMIT_SHA:0:7}
       - ${DRONE_TAG}
     dockerfile: docker/Dockerfile.linux.amd64
     environment:
       - DOCKER_LAUNCH_DEBUG=true
     secrets: [google_credentials]
     when:
-      event: [push, tag]
-      branch: [master]
-    # pull: true
-    # secrets: [ docker_username, docker_password ]
+      event: tag
+      branch: master
+
 ---
 # kind: pipeline
 # name: testing
