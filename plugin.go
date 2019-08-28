@@ -1,12 +1,15 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
+	"strconv"
 	"strings"
 
 	"github.com/bluele/slack"
 	"github.com/drone/drone-template-lib/template"
+	"github.com/google/go-github/v28/github"
 )
 
 type (
@@ -44,6 +47,7 @@ type (
 		IconEmoji string
 		LinkNames bool
 		Usermaps  string
+		PRMessage bool
 	}
 
 	Job struct {
@@ -73,21 +77,6 @@ func (p Plugin) Exec() error {
 	payload.IconUrl = p.Config.IconURL
 	payload.IconEmoji = p.Config.IconEmoji
 
-	// Parse Recipient
-	usermaps := make(map[string]string)
-	if p.Config.Usermaps != "" {
-		if err := json.Unmarshal([]byte(p.Config.Usermaps), &usermaps); err != nil {
-			return err
-		}
-	}
-	if p.Config.Recipient != "" {
-		if val, ok := usermaps[p.Config.Recipient]; ok {
-			p.Config.Recipient = val
-		}
-		payload.Channel = prepend("@", p.Config.Recipient)
-	} else if p.Config.Channel != "" {
-		payload.Channel = prepend("#", p.Config.Channel)
-	}
 	if p.Config.LinkNames == true {
 		payload.LinkNames = "1"
 	}
@@ -96,29 +85,51 @@ func (p Plugin) Exec() error {
 		if err != nil {
 			return err
 		}
-
 		attachment.Text = txt
 	}
+	// Generate extra message when pr-message: true
+	if p.Config.PRMessage {
+		prAttachment := slack.Attachment{
+			Fallback:   fallback(p.Repo, p.Build),
+			Color:      color(p.Build),
+			MarkdownIn: []string{"text", "fallback"},
+			ImageURL:   p.Config.ImageURL,
+		}
+		pullNum, err := strconv.Atoi(p.Build.Pull)
+		if err != nil {
+			return err
+		}
+		pullBody, err := pullMessage(p.Repo, pullNum)
+		if err != nil {
+			return err
+		}
+		prAttachment.Text = fmt.Sprintf("The pull request contains:\n%s\n", pullBody)
+		payload.Attachments = append(payload.Attachments, &prAttachment)
+	}
 
+	// Parse Recipient
+	usermaps := make(map[string]string)
+	if p.Config.Usermaps != "" {
+		if err := json.Unmarshal([]byte(p.Config.Usermaps), &usermaps); err != nil {
+			return err
+		}
+	}
+	// Parse all target, including channels
 	targetList := make([]string, 0)
 	if p.Config.Recipient != "" {
-		fmt.Printf("Config.Recipient:%s\n", p.Config.Recipient)
 		recipients := strings.Split(p.Config.Recipient, ",")
 		for _, recipient := range recipients {
 
 			if val, ok := usermaps[recipient]; ok {
-				// p.Config.Recipient = val
 				targetList = append(targetList, prepend("@", val))
 			} else {
 				targetList = append(targetList, prepend("@", recipient))
 			}
 		}
-		// payload.Channel = prepend("@", p.Config.Recipient)
 	}
 	if p.Config.Channel != "" {
 		channels := strings.Split(p.Config.Channel, ",")
 		for _, channel := range channels {
-			// payload.Channel = prepend("#", p.Config.Channel)
 			targetList = append(targetList, prepend("#", channel))
 		}
 	}
@@ -141,6 +152,16 @@ func message(repo Repo, build Build) string {
 		build.Branch,
 		build.Author,
 	)
+}
+func pullMessage(repo Repo, pullNum int) (string, error) {
+	client := github.NewClient(nil)
+	var ctx = context.Background()
+
+	pr, _, err := client.PullRequests.Get(ctx, repo.Owner, repo.Name, 947)
+	if err != nil {
+		return "", err
+	}
+	return *pr.Body, nil
 }
 
 func fallback(repo Repo, build Build) string {
