@@ -100,8 +100,35 @@ func (p Plugin) Exec() error {
 		attachment.Text = txt
 	}
 
+	targetList := make([]string, 0)
+	if p.Config.Recipient != "" {
+		fmt.Printf("Config.Recipient:%s\n", p.Config.Recipient)
+		recipients := strings.Split(p.Config.Recipient, ",")
+		for _, recipient := range recipients {
+
+			if val, ok := usermaps[recipient]; ok {
+				// p.Config.Recipient = val
+				targetList = append(targetList, prepend("@", val))
+			} else {
+				targetList = append(targetList, prepend("@", recipient))
+			}
+		}
+		// payload.Channel = prepend("@", p.Config.Recipient)
+	}
+	if p.Config.Channel != "" {
+		channels := strings.Split(p.Config.Channel, ",")
+		for _, channel := range channels {
+			// payload.Channel = prepend("#", p.Config.Channel)
+			targetList = append(targetList, prepend("#", channel))
+		}
+	}
 	client := slack.NewWebHook(p.Config.Webhook)
-	return client.PostMessage(&payload)
+	var err error
+	for _, receiver := range targetList {
+		payload.Channel = receiver
+		err = client.PostMessage(&payload)
+	}
+	return err
 }
 
 func message(repo Repo, build Build) string {
