@@ -166,6 +166,11 @@ func main() {
 			Usage:  "job started",
 			EnvVar: "DRONE_JOB_STARTED",
 		},
+		cli.BoolFlag{
+			Name:   "pr-message",
+			Usage:  "show pull message",
+			EnvVar: "PLUGIN_PR_MESSAGE",
+		},
 	}
 
 	if err := app.Run(os.Args); err != nil {
@@ -208,8 +213,9 @@ func run(c *cli.Context) error {
 			ImageURL:  c.String("image"),
 			IconURL:   c.String("icon.url"),
 			IconEmoji: c.String("icon.emoji"),
-			LinkNames: c.Bool("link_names"),
+			LinkNames: c.Bool("link-names"),
 			Usermaps:  c.String("usermaps"),
+			PRMessage: c.Bool("pr-message"),
 		},
 	}
 

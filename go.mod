@@ -5,6 +5,7 @@ require (
 	github.com/aymerick/raymond v2.0.2+incompatible // indirect
 	github.com/bluele/slack v0.0.0-20180528010058-b4b4d354a079
 	github.com/drone/drone-template-lib v0.0.0-20181004051823-4019baa6c594
+	github.com/google/go-github/v28 v28.0.0
 	github.com/pkg/errors v0.8.1 // indirect
 	github.com/stretchr/testify v1.3.0 // indirect
 	github.com/tkuchiki/faketime v0.1.1 // indirect
