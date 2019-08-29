@@ -86,24 +86,31 @@ func (p Plugin) Exec() error {
 			return err
 		}
 		attachment.Text = txt
+	} else {
+		attachment.Text = message(p.Repo, p.Build)
 	}
 	// Generate extra message when pr-message: true
 	if p.Config.PRMessage {
+		pullNum, err := strconv.Atoi(p.Build.Pull)
+		if err != nil {
+			return err
+		}
+		pr, err := pullMessage(p.Repo, pullNum)
+		if err != nil {
+			return err
+		}
 		prAttachment := slack.Attachment{
 			Fallback:   fallback(p.Repo, p.Build),
 			Color:      color(p.Build),
 			MarkdownIn: []string{"text", "fallback"},
 			ImageURL:   p.Config.ImageURL,
+
+			Pretext:    "The pull request content for this build is listed below",
+			AuthorName: p.Build.Author,
+			Title:      *pr.Title,
+			TitleLink:  *pr.HTMLURL,
+			Text:       *pr.Body,
 		}
-		pullNum, err := strconv.Atoi(p.Build.Pull)
-		if err != nil {
-			return err
-		}
-		pullBody, err := pullMessage(p.Repo, pullNum)
-		if err != nil {
-			return err
-		}
-		prAttachment.Text = fmt.Sprintf("The pull request contains:\n%s\n", pullBody)
 		payload.Attachments = append(payload.Attachments, &prAttachment)
 	}
 
@@ -153,15 +160,15 @@ func message(repo Repo, build Build) string {
 		build.Author,
 	)
 }
-func pullMessage(repo Repo, pullNum int) (string, error) {
+func pullMessage(repo Repo, pullNum int) (*github.PullRequest, error) {
 	client := github.NewClient(nil)
 	var ctx = context.Background()
 
 	pr, _, err := client.PullRequests.Get(ctx, repo.Owner, repo.Name, 947)
 	if err != nil {
-		return "", err
+		return nil, err
 	}
-	return *pr.Body, nil
+	return pr, nil
 }
 
 func fallback(repo Repo, build Build) string {
