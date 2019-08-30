@@ -92,13 +92,11 @@ pipeline:
       branch: [master]
     # pull: true
     # secrets: [ docker_username, docker_password ]
-
+  
   publish_linux_amd64:
     image: plugins/gcr
     repo: mirrormedia-1470651750304/${DRONE_REPO_NAME}
-    tag:
-      - ${DRONE_COMMIT_SHA:0:7}
-      - ${DRONE_TAG}
+    auto_tag: true
     dockerfile: docker/Dockerfile.linux.amd64
     environment:
       - DOCKER_LAUNCH_DEBUG=true
@@ -107,6 +105,23 @@ pipeline:
       event: tag
       branch: master
 
+  fetch-tags:
+    image: plugins/git
+    commands:
+      - git fetch --tags
+    when:
+      event: tag
+      branch: master
+
+  generate_changelog:
+    image: node:latest
+    secrets: [conventional_github_releaser_token]
+    commands:
+      - npm install -g conventional-github-releaser
+      - conventional-github-releaser -p angular
+    when:
+      event: tag
+      branch: master
 ---
 # kind: pipeline
 # name: testing
